@@ -11,9 +11,14 @@ import Validate from '../pages/validate'
 import Addres from '../pages/addresses'
 import AddAddres from '../pages/addAddress'
 import SelectAddress from '../components/selectAddress'
-import foot from '../components/foot'
 import Price from '../pages/price'
 import Query from '../pages/query'
+import nick from '../pages/nick'
+import realname from '../pages/realname'
+import phone from '../pages/phone'
+import tel from '../pages/tel'
+import email from '../pages/email'
+import validateInfo from '../pages/validateInfo'
 
 Vue.use(Router)
 
@@ -73,6 +78,30 @@ export default new Router({
       path: '/price',
       name: 'price',
       component: Price
+    },{
+      path: '/nick',
+      name: 'nick',
+      component: nick
+    },{
+      path: '/realname',
+      name: 'realname',
+      component: realname
+    },{
+      path: '/phone',
+      name: 'phone',
+      component: phone
+    },{
+      path: '/tel',
+      name: 'tel',
+      component: tel
+    },{
+      path: '/email',
+      name: 'email',
+      component: email
+    },{
+      path: '/validateInfo',
+      name: 'validateInfo',
+      component: validateInfo
     }
 
   ]

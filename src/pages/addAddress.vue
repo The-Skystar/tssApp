@@ -7,12 +7,12 @@
       </mt-header>
       <div id="name">
         <p>收货人</p>
-        <input type="text" placeholder="请填写收货人姓名">
+        <input type="text" placeholder="请填写收货人姓名" v-model="sender">
       </div>
       <div class="bottomLine"></div>
       <div id="tel">
         <p>手机号码</p>
-        <input type="text" placeholder="请填写收货人手机号码">
+        <input type="text" placeholder="请填写收货人手机号码" v-model="phone">
       </div>
       <div class="bottomLine"></div>
       <div id="dis">
@@ -20,13 +20,13 @@
         <div class="addAddress" @click="choseAdd()">
           <input type="text" placeholder="省市区县、镇等" class="txtmangth" disabled="disabled" v-model="userAddress">
         </div>
-        <div class="loca"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+        <div class="loca" @click="getlocation"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
 
       </div>
       <div class="bottomLine"></div>
       <div id="addr">
         <p>详细地址</p>
-        <input type="text" placeholder="请填写收货人详细地址">
+        <input type="text" placeholder="请填写收货人详细地址" v-model="address">
       </div>
       <div class="bottomLine"></div>
       <div id="def" style="font-size: 13px">
@@ -35,7 +35,7 @@
         </mt-cell>
       </div>
       <div class="bottomLine"></div>
-      <mt-button size="large" type="primary">新增地址</mt-button>
+      <mt-button size="large" type="primary" @click="addAddress">新增地址</mt-button>
       <section class="address" :class="{toggHeight:istoggHeight}">
         <section class="title">
           <div class="area" @click="provinceSelected()" :class="[oneac ? 'accolor' : '']">{{Province?Province:'请选择'}}</div>
@@ -65,6 +65,8 @@
 
 <script>
   import { zmGetProvincesArr,zmGetCitiesArr,zmGetAreaArr,zmGetStreetArr } from '../assets/js/zmRegion'
+  import {Toast} from 'mint-ui'
+  // import BMap from 'BMap'
   export default {
     name: 'addAddress',
     data () {
@@ -107,6 +109,11 @@
         selected: true,
         ProvinceList: zmGetProvincesArr() ,// 三级联动城市列表
         value: false,
+        sender:'',
+        phone:'',
+        address:'',
+        defaultAddr:'0',
+        userlocation: { lng: "", lat: "" },
       }
     },
     mounted () {
@@ -143,7 +150,7 @@
         //       this.info = res.resData[0].regionalInformation
         //     }
         //   })
-        console.log(111)
+        // console.log(111)
       }
     },
     methods: {
@@ -191,7 +198,7 @@
         proJuliBox.scrollTo(0, t)
       },
       getProvinceId: function (code, input, index) { // 点击第一个li
-        console.log('code', code, input, index)
+        // console.log('code', code, input, index)
         this.titleIndex = Number
         this.province = code
         this.Province = input // 获取选中的省份
@@ -348,7 +355,75 @@
         }
       },
       isdefault(){
-        console.log(this.value);
+        if (this.value)
+          this.defaultAddr='1';
+        else this.defaultAddr = '0';
+      },
+      addAddress(){
+        let params = {
+          "userId":JSON.parse(this.$store.state.currentUser).userId,
+          "contact":this.sender,
+          "phone":this.phone,
+          "province":this.province,
+          "city":this.city,
+          "county":this.county,
+          "street":this.street,
+          "address":this.address,
+          "isDefault":this.defaultAddr
+        };
+        let config = {
+          headers:{
+            "token":sessionStorage.getItem("token"),
+            "userId":JSON.parse(this.$store.state.currentUser).userId
+          }
+        };
+        let self = this;
+        this.$axios.post("/tss/createAddress",this.qs.stringify(params),config).then(function (res) {
+            console.log(res.data);
+        }).catch(function (error) {
+          if (error.response.status==401) {
+            Toast({
+              message:'您还未登录！',
+              position:'middle',
+              duration:2000
+            })
+            setTimeout(function (){self.$router.push("/login")},2000);
+
+          }
+        })
+      },
+      getlocation () {
+        //获取当前位置
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition((r) =>{
+          if(geolocation.getStatus() == BMAP_STATUS_SUCCESS){
+            this.userlocation = r.point;
+            let self = this;
+            this.$axios.get("/tss/geocoder?longitude=+"+this.userlocation.lng+"&latitude="+this.userlocation.lat).then(function (res) {
+              if (res.data.data.status==0){
+                self.setAddress(res.data.data.result.addressComponent);
+              }else{
+                Toast({
+                  message: '获取定位失败',
+                  position: 'middle',
+                  duration: 1500
+                })
+              }
+            })
+          }else {
+            Toast({
+              message: '定位失败'+this.getStatus(),
+              position: 'middle',
+              duration: 1500
+            })
+          }
+        });
+      },
+      setAddress(data){
+        this.province = data.province;
+        this.city = data.city;
+        this.district = data.district;
+        this.userAddress = data.province + ' ' + data.city + ' ' + data.district;
       }
     },
     beforeDestroy () {

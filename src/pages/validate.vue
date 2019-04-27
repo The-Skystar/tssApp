@@ -13,12 +13,14 @@
         <p v-show="previewFront^true">上传身份证正面</p>
         <input type="file" class="file" id="front" name="file" accept="image/png,image/jpg,image/jpeg" @change="change($event)">
         <img src="" id="frontimg" v-show="previewFront^false">
+        <div class="shadow" v-show="showShadow1">{{showShadowText1}}</div>
       </div>
       <div id="backId"  @click="getBack">
         <img src="../assets/img/upload.png" alt="" v-show="previewBack^true">
         <p v-show="previewBack^true">上传身份证反面</p>
         <input type="file" class="file" id="back" name="file" accept="image/png,image/jpg,image/jpeg" @change="changeback($event)">
         <img src="" id="backimg" v-show="previewBack^false">
+        <div class="shadow" v-show="showShadow2">{{showShadowText2}}</div>
       </div>
     </div>
     <mt-button size="large" @click="authen">提交认证</mt-button>
@@ -52,6 +54,10 @@
         previewFront: false,
         previewBack: false,
         idCard: '',
+        showShadow1:false,
+        showShadow2:false,
+        showShadowText1:'',
+        showShadowText2:'',
       }
     },
     methods: {
@@ -285,24 +291,42 @@
         //这边写图片的上传
         let param = new FormData();
         param.append("file",this.getBase64ToBolb(imageData));
-        param.append("userId","4616655ebd4e4100a7ef64aa7a478011");
+        param.append("userId",JSON.parse(this.$store.state.currentUser).userId);
         let config = {
-          headers:{'Content-Type':false}
+          headers:{
+            'Content-Type':false,
+            "token":sessionStorage.getItem("token"),
+            "userId":JSON.parse(this.$store.state.currentUser).userId
+          }
         };
         this.$axios.defaults.withCredentials = true;
         if (this.idCard==="front"){
-          this.$axios.post("/authenFront",param,config).then(function (res) {
-            console.log(res.data);
-            if (res.data.code===201)
-            Toast({
-              message: '上传成功',
-              position: 'middle',
-              duration: 1000
-            });
+          this.$axios.post("http://localhost:8081/authenFront",param,config).then(function (res) {
+            if (res.data.code===201){
+              self.showShadow1 = true;
+              self.showShadowText1='上传成功';
+            }else {
+              Toast({
+                message: '上传失败',
+                position: 'middle',
+                duration: 1000
+              });
+            }
           })
         }
         else {
-          this.$axios.post("/authenBack",param,config)
+          this.$axios.post("http://localhost:8081/authenBack",param,config).then(function (res) {
+            if (res.data.code===201){
+              self.showShadow2 = true;
+              self.showShadowText2='上传成功';
+            }else {
+              Toast({
+                message: '上传失败',
+                position: 'middle',
+                duration: 1000
+              });
+            }
+          })
         }
 
         let self = this;
@@ -462,9 +486,23 @@
         return new Blob([u8arr],{type:mime})
       },
       authen(){
-        let param = {'userId':'4616655ebd4e4100a7ef64aa7a478011'}
-        this.$axios.post('/cer',this.qs.stringify(param)).then(function (res) {
-          console.log(res.data);
+        let param = {'userId':JSON.parse(this.$store.state.currentUser).userId}
+        let self = this;
+        this.$axios.post('http://localhost:8081/cer',this.qs.stringify(param)).then(function (res) {
+          if (res.data.code==205){
+            self.$store.dispatch('validate',JSON.stringify(res.data.data));
+            Toast({
+              message:'认证通过',
+              position:'middle',
+              duration:3000
+            });
+          }else{
+            Toast({
+              message:'认证失败，请重新认证',
+              position:'middle',
+              duration:1000
+            });
+          }
         })
       }
     }
@@ -517,6 +555,7 @@
     width: 180px;
     height: 120px;
     margin: 0;
+    z-index: 98;
   }
 </style>
 <!--<style scoped>-->
@@ -1012,5 +1051,17 @@
   .cropper-disabled .cropper-line,
   .cropper-disabled .cropper-point {
     cursor: not-allowed;
+  }
+  .shadow{
+    width: 184px;
+    height: 124px;
+    position: relative;
+    top: -123px;
+    left: -2px;
+    display: flex;
+    background: rgba(0,0,0,0.3);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
   }
 </style>

@@ -16,7 +16,28 @@
     // components: {
     //   'footer-bar': Footer
     // },
-    computed: {}
+    computed: {},
+    created () {
+      var self = this;
+      let currentUser = localStorage.getItem("user");
+      if (currentUser!=null){
+        let user = JSON.parse(currentUser);
+        let params = {
+          "token":localStorage.getItem("token")
+        }
+        this.$axios.post("/tss/autoLogin",this.qs.stringify(params)).then(function (res) {
+          if (res.data.code==100){
+            localStorage.setItem("user",JSON.stringify(res.data.data));
+            localStorage.setItem("token",res.data.msg);
+            sessionStorage.setItem("token",res.data.msg);
+            self.$store.dispatch('setUser',JSON.stringify(res.data.data));
+            self.$store.dispatch("updLogin",true);
+          }
+        })
+      };
+
+    },
+
   }
 </script>
 

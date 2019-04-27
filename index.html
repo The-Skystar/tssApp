@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>tssapp</title>
+    <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=2.0&ak=N57XjUQ4huiFBpy12NyGE92wpeai8mLb"></script>
     <style>
       body {
         margin: 0;
@@ -16,6 +17,7 @@
   <body>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+
     <script>
       var showMenu = false;
       mui.plusReady(function() {
@@ -40,6 +42,7 @@
               }, 1000);
             } else {
               if (new Date().getTime() - first < 1000) {
+
                 plus.runtime.quit();
               }
             }

@@ -9,6 +9,7 @@ import Axios from 'axios'
 import  Qs from 'querystring'
 import 'font-awesome/css/font-awesome.css'
 import Mui from 'vue-awesome-mui'
+import store from './vuex/store'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = Axios
@@ -21,6 +22,8 @@ Vue.use(Mui)
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+
 })

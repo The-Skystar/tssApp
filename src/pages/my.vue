@@ -5,9 +5,9 @@
         <img src="../assets/img/avatar.jpg" class="avatar">
       </div>
       <div id="header-right">
-        <p class="name" v-show="loginStatus^false">杨向军</p>
+        <p class="name" v-show="loginStatus^false">{{username}}</p>
         <p class="phone" v-show="loginStatus^false">
-          137****4657
+          {{phone}}
         </p>
         <p class="loginRegist" v-show="loginStatus^true"><a href="#/login" @click="toLogin">登录</a>/<a href="#/regist" @click="toRegist">注册</a></p>
       </div>
@@ -40,10 +40,10 @@
             <img src="../../static/editor.png" class="icon">
             <p>上课签到</p>
           </td>
-          <td>
+          <!--<td @click="exitLogin">-->
             <!--<img src="../../static/editor.png" class="icon">-->
             <!--<p>客服服务</p>-->
-          </td>
+          <!--</td>-->
         </tr>
       </table>
     </div>
@@ -80,13 +80,16 @@
     },
     data () {
       return {
-        loginStatus:false,
+        loginStatus:this.$store.state.isLogin,
         selected:'UserCenter',
-        tabs: [require("../assets/img/home.png"),require("../assets/img/tool.png"), require("../assets/img/user_selected.png")]
+        tabs: [require("../assets/img/home.png"),require("../assets/img/tool.png"), require("../assets/img/user_selected.png")],
+        username:'',
+        phone:'',
       }
     },
     created () { // 页面创建生命周期函数
-      this.initWebSocket()
+      this.initWebSocket();
+      this.loginState();
     },
     mounted(){
     },
@@ -96,7 +99,7 @@
     methods: {
       initWebSocket: function () {
         // ws等同http，wss等同https,其中ip为后端应用主机，port为后端启动所占用的端口
-        this.websock = new WebSocket('ws://127.0.0.1:8081/websocket/999')
+        this.websock = new WebSocket('ws://127.0.0.1:8082/websocket/999')
         this.websock.onopen = this.websocketonopen
         this.websock.onerror = this.websocketonerror
         this.websock.onmessage = this.websocketonmessage
@@ -123,16 +126,20 @@
         this.$router.push('/regist')
       },
       toUserInfo:function () {
-        this.$router.push('/user')
+        this.goto("/user");
       },
       toUpdPwd:function () {
-        this.$router.push('/updPwd')
+        this.goto("/updPwd");
       },
       toValidate:function () {
-        this.$router.push('/validate')
+        if (localStorage.getItem("validate")!=null){
+          this.$router.push("/validateInfo");
+        } else {
+          this.goto('/validate');
+        }
       },
       toAddress:function () {
-        this.$router.push('/addres')
+        this.goto('/addres');
       },
       toPrice:function () {
         this.$router.push('/price')
@@ -140,6 +147,24 @@
       toQuery:function () {
         this.$router.push('/query')
       },
+      loginState(){
+        let user = JSON.parse(this.$store.state.currentUser);
+        this.username=user.userNick;
+        if (user.phone==null){
+          this.phone='未绑定手机号'
+        } else {
+          let jmPhone = user.phone.substr(0,3)+"****"+user.phone.slice(-4);
+          this.phone=jmPhone;
+        }
+      },
+      goto(url){
+        let user = JSON.parse(this.$store.state.currentUser);
+        if (user==null){
+          this.$router.push("/login");
+        }else {
+          this.$router.push(url)
+        }
+      }
     }
   }
 </script>
