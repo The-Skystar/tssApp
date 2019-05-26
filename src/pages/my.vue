@@ -36,7 +36,7 @@
             <img src="../../static/editor.png" class="icon">
             <p>地址管理</p>
           </td>
-          <td>
+          <td @click="toQRcode">
             <img src="../../static/editor.png" class="icon">
             <p>上课签到</p>
           </td>
@@ -85,40 +85,19 @@
         tabs: [require("../assets/img/home.png"),require("../assets/img/tool.png"), require("../assets/img/user_selected.png")],
         username:'',
         phone:'',
+        receive:0,
       }
     },
     created () { // 页面创建生命周期函数
-      this.initWebSocket();
       this.loginState();
+
     },
     mounted(){
     },
     destroyed: function () { // 离开页面生命周期函数
-      this.websocketclose()
     },
     methods: {
-      initWebSocket: function () {
-        // ws等同http，wss等同https,其中ip为后端应用主机，port为后端启动所占用的端口
-        this.websock = new WebSocket('ws://127.0.0.1:8082/websocket/999')
-        this.websock.onopen = this.websocketonopen
-        this.websock.onerror = this.websocketonerror
-        this.websock.onmessage = this.websocketonmessage
-        this.websock.onclose = this.websocketclose
-      },
-      websocketonopen: function () {
-        console.log('WebSocket连接成功')
-      },
-      websocketonerror: function (e) {
-        console.log('WebSocket连接发生错误')
-      },
-      websocketonmessage: function (e) {
-        // var da = JSON.parse(e.data)
-        console.log(e.data)
-        this.message = e.data
-      },
-      websocketclose: function (e) {
-        console.log('connection closed (' + e.code + ')')
-      },
+
       toLogin:function () {
         this.$router.push('/login')
       },
@@ -132,7 +111,7 @@
         this.goto("/updPwd");
       },
       toValidate:function () {
-        if (localStorage.getItem("validate")!=null){
+        if (localStorage.getItem(this.$store.state.currentUser.userId)!=null){
           this.$router.push("/validateInfo");
         } else {
           this.goto('/validate');
@@ -145,7 +124,11 @@
         this.$router.push('/price')
       },
       toQuery:function () {
-        this.$router.push('/query')
+        // this.$router.push('/query')
+        window.location.href= "https://m.kuaidi100.com/result.jsp";
+      },
+      toQRcode(){
+        this.$router.push("/QRcode")
       },
       loginState(){
         let user = JSON.parse(this.$store.state.currentUser);

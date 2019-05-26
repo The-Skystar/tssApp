@@ -11,10 +11,11 @@ import 'font-awesome/css/font-awesome.css'
 import Mui from 'vue-awesome-mui'
 import store from './vuex/store'
 
+
 Vue.config.productionTip = false
 Vue.prototype.$axios = Axios
 Vue.prototype.qs = Qs
-Axios.defaults.baseURL = '/api'
+// Axios.defaults.baseURL = '/api'
 Vue.use(MintUI)
 Vue.use(Mui)
 

@@ -301,7 +301,7 @@
         };
         this.$axios.defaults.withCredentials = true;
         if (this.idCard==="front"){
-          this.$axios.post("http://localhost:8081/authenFront",param,config).then(function (res) {
+          this.$axios.post("http://10.156.85.170:8081/authenFront",param,config).then(function (res) {
             if (res.data.code===201){
               self.showShadow1 = true;
               self.showShadowText1='上传成功';
@@ -315,7 +315,7 @@
           })
         }
         else {
-          this.$axios.post("http://localhost:8081/authenBack",param,config).then(function (res) {
+          this.$axios.post("http://10.156.85.170:8081/authenBack",param,config).then(function (res) {
             if (res.data.code===201){
               self.showShadow2 = true;
               self.showShadowText2='上传成功';
@@ -488,14 +488,16 @@
       authen(){
         let param = {'userId':JSON.parse(this.$store.state.currentUser).userId}
         let self = this;
-        this.$axios.post('http://localhost:8081/cer',this.qs.stringify(param)).then(function (res) {
+        this.$axios.post('http://10.156.85.170:8081/cer',this.qs.stringify(param)).then(function (res) {
           if (res.data.code==205){
+            localStorage.setItem(self.$store.state.currentUser.userId,JSON.stringify(res.data.data));
             self.$store.dispatch('validate',JSON.stringify(res.data.data));
             Toast({
               message:'认证通过',
               position:'middle',
               duration:3000
             });
+            self.$router.push("/my")
           }else{
             Toast({
               message:'认证失败，请重新认证',

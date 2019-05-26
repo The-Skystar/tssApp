@@ -10,10 +10,10 @@
         <p class="word">寄</p>
       </div>
       <div id="senddis">
-        <div class="addAddress"  @click="openSend()">
+        <div class="addAddress" @click="openSend()">
           <input type="text" placeholder="省市区县、镇等" class="txtmangth" disabled="disabled" v-model="sendAddress">
         </div>
-        <div class="loca"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+        <div class="loca" @click="getlocation('send')"><img src="../assets/img/loc1.jpg" style="width: 35px;height: 35px"/></i></div>
       </div>
     </div>
     <div id="receiver">
@@ -21,10 +21,10 @@
         <p class="word" style="background-color: limegreen">收</p>
       </div>
       <div id="receivedis">
-        <div class="addAddress"  @click="openReceive()">
+        <div class="addAddress" @click="openReceive()">
           <input type="text" placeholder="省市区县、镇等" class="txtmangth" disabled="disabled" v-model="receiveAddress">
         </div>
-        <div class="loca"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+        <div class="loca" @click="getlocation('receive')"><img src="../assets/img/loc1.jpg" style="width: 35px;height: 35px"/></div>
       </div>
     </div>
     <mt-cell title="重量" align="left">
@@ -34,30 +34,40 @@
     </mt-cell>
     <section class="address" :class="{toggHeight:istoggHeight}">
       <section class="title">
-        <div class="area" @click="provinceSelected()" :class="[oneac ? 'accolor' : '']">{{Province?Province:'请选择'}}</div>
-        <div class="area" @click="citySelected()" :class="[twoac ? 'accolor':'']" v-show="twoshow">{{City?City:'请选择'}}</div>
-        <div class="area" @click="districtSelected()" :class="threeac ? 'accolor':''" v-show="threeshow">{{District?District:'请选择'}}</div>
-        <div class="area" @click="streetSelected()" :class="fourac ? 'accolor':''" v-show="fourshow">{{Street?Street:'请选择'}}</div>
+        <div class="area" @click="provinceSelected()" :class="[oneac ? 'accolor' : '']">{{Province?Province:'请选择'}}
+        </div>
+        <div class="area" @click="citySelected()" :class="[twoac ? 'accolor':'']" v-show="twoshow">{{City?City:'请选择'}}
+        </div>
+        <div class="area" @click="districtSelected()" :class="threeac ? 'accolor':''" v-show="threeshow">
+          {{District?District:'请选择'}}
+        </div>
+        <div class="area" @click="streetSelected()" :class="fourac ? 'accolor':''" v-show="fourshow">
+          {{Street?Street:'请选择'}}
+        </div>
         <div class="determine" v-show="showDeter" @click="determine()">确定</div>
       </section>
       <ul v-show="showProvince" class="proJuli">
-        <li class="addList" v-for="(v,k) in ProvinceList" @click="getProvinceId(v.code, v.name, k)" :key="v.code"  :class="{active : v.selected}"><span>{{v.name}}</span></li>
+        <li class="addList" v-for="(v,k) in ProvinceList" @click="getProvinceId(v.code, v.name, k)" :key="v.code"
+            :class="{active : v.selected}"><span>{{v.name}}</span></li>
       </ul>
       <ul v-show="showCity" class="citJuli">
-        <li class="addList" v-for="(v,k) in showCityList" @click="getCityId(v.code, v.name, k)"  :key="v.code"  :class="{active : v.selected}"><span>{{v.name}}</span></li>
+        <li class="addList" v-for="(v,k) in showCityList" @click="getCityId(v.code, v.name, k)" :key="v.code"
+            :class="{active : v.selected}"><span>{{v.name}}</span></li>
       </ul>
       <ul v-show="showDistrict" class="disJuli">
-        <li class="addList" v-for="(v,k) in showDistrictList" @click="getDistrictId(v.code, v.name, k)" :key="v.code" :class="{active : v.selected}"><span>{{v.name}}</span></li>
+        <li class="addList" v-for="(v,k) in showDistrictList" @click="getDistrictId(v.code, v.name, k)" :key="v.code"
+            :class="{active : v.selected}"><span>{{v.name}}</span></li>
       </ul>
       <ul v-show="showStreet" class="strJuli">
-        <li class="addList" v-for="(v,k) in showStreetList" @click="getStreetId(v.code, v.name, k)" :key="v.code" :class="{active : v.selected}"><span>{{v.name}}</span></li>
+        <li class="addList" v-for="(v,k) in showStreetList" @click="getStreetId(v.code, v.name, k)" :key="v.code"
+            :class="{active : v.selected}"><span>{{v.name}}</span></li>
       </ul>
     </section>
     <!-- 收货地址三级联动选项 end-->
     <div class="layout" :class="{layoutBg:islayout}" @click="closeAdd()"></div>
     <div id="notice">
       <div @click="openDate">
-        <mt-cell title="上门时间" is-link align="left">
+        <mt-cell title="寄件时间" is-link align="left">
           <span>{{noticetime}}</span>
         </mt-cell>
       </div>
@@ -71,23 +81,28 @@
           </div>
           <div id="appHour">
             <ul id="list">
-              <li id="one" :class="onedisable&day==='today'?'disable':'timeli'" @click="selectHour('09:00-11:00','one')">
+              <li id="one" :class="onedisable&day==='today'?'disable':'timeli'"
+                  @click="selectHour('09:00-11:00','one')">
                 09:00&nbsp;-&nbsp;11:00
                 <img src="">
-              </li >
-              <li id="two" :class="twodisable&day==='today'?'disable':'timeli'"  @click="selectHour('11:00-13:00','two')">
+              </li>
+              <li id="two" :class="twodisable&day==='today'?'disable':'timeli'"
+                  @click="selectHour('11:00-13:00','two')">
                 11:00&nbsp;-&nbsp;13:00
                 <img src="">
               </li>
-              <li id="three" :class="threedisable&day==='today'?'disable':'timeli'"  @click="selectHour('13:00-15:00','three')">
+              <li id="three" :class="threedisable&day==='today'?'disable':'timeli'"
+                  @click="selectHour('13:00-15:00','three')">
                 13:00&nbsp;-&nbsp;15:00
                 <img src="">
               </li>
-              <li id="four" :class="fourdisable&day==='today'?'disable':'timeli'"  @click="selectHour('15:00-17:00','four')">
+              <li id="four" :class="fourdisable&day==='today'?'disable':'timeli'"
+                  @click="selectHour('15:00-17:00','four')">
                 15:00&nbsp;-&nbsp;17:00
                 <img src="">
               </li>
-              <li id="five" :class="fivedisable&day==='today'?'disable':'timeli'"  @click="selectHour('17:00-19:00','five')">
+              <li id="five" :class="fivedisable&day==='today'?'disable':'timeli'"
+                  @click="selectHour('17:00-19:00','five')">
                 17:00&nbsp;-&nbsp;19:00
                 <img src="">
               </li>
@@ -96,20 +111,22 @@
         </div>
       </mt-popup>
     </div>
-    <mt-button size="large" type="primary">查询</mt-button>
+    <mt-button size="large" type="primary" @click="toestimate">查询</mt-button>
   </div>
 
 </template>
 
 <script>
-  import { zmGetProvincesArr,zmGetCitiesArr,zmGetAreaArr,zmGetStreetArr } from '../assets/js/zmRegion'
+  import {zmGetProvincesArr, zmGetCitiesArr, zmGetAreaArr, zmGetStreetArr} from '../assets/js/zmRegion'
+  import {Toast} from 'mint-ui'
+
   export default {
     name: 'price',
-    data(){
-      return{
-        receiveAddress:'',
-        sendAddress:"",
-        currentSelected:'',
+    data () {
+      return {
+        receiveAddress: '',
+        sendAddress: '',
+        currentSelected: '',
         goodsweight: 1,
         islayout: false,
         istoggHeight: false,
@@ -123,11 +140,11 @@
         fourac: false,
         twoshow: false,
         threeshow: false,
-        fourshow:false,
+        fourshow: false,
         userAddress: '',
         oneliIndex: '', // 用于高亮子菜单
         twoliIndex: '',
-        threeIndex:'',
+        threeIndex: '',
         titleIndex: Number,
         showProvince: true, // 第一个li默认显示
         showCity: false, // 第二个li默认隐藏
@@ -135,21 +152,22 @@
         showStreet: false,
         showCityList: [],
         showDistrictList: [],
-        showStreetList:[],
+        showStreetList: [],
         province: '',
         city: '',
         district: '',
-        street:'',
+        street: '',
         GetProvinceId: 2,
         District: '',
         Province: '',
         City: '',
-        Street:'',
+        Street: '',
         // v-for循环判断是否为当前
         selected: true,
-        ProvinceList: zmGetProvincesArr() ,// 三级联动城市列表
+        ProvinceList: zmGetProvincesArr(),// 三级联动城市列表
         value: false,
         noticetime: '',
+        timeString: '',
         timeVisible: false,
         day: 'today',
         onedisable: false,
@@ -157,13 +175,16 @@
         threedisable: false,
         fourdisable: false,
         fivedisable: false,
+        userlocation: {lng: '', lat: ''},
+        sendString: '',
+        receiveString: '',
       }
     },
     mounted () {
-      document.querySelector('body').style.backgroundColor = '#f5f7fa';
+      document.querySelector('body').style.backgroundColor = '#f5f7fa'
     },
     created () {
-      this.inittime();
+      this.inittime()
       if (this.$route.query.data !== undefined) { // 如果是点击编辑地址过来，则执行...当然了，不一定非要用路由传参的方式，你也可以用本地存储，反正能证明你是点击了编辑地址过来就好
         this.showDeter = true
         this.headerTxt = '编辑收货地址'
@@ -196,28 +217,26 @@
         //   })
       }
     },
-    watch:{
-
-    },
-    methods:{
-      openSend(){
-        this.currentSelected = 'sender';
+    watch: {},
+    methods: {
+      openSend () {
+        this.currentSelected = 'sender'
         this.islayout = true
         this.istoggHeight = true
         if (this.$route.query.data !== undefined) {
           this._gotoTop('.proJuli', 0)
         }
       },
-      openReceive(){
-        this.currentSelected = 'receiver';
+      openReceive () {
+        this.currentSelected = 'receiver'
         this.islayout = true
         this.istoggHeight = true
         if (this.$route.query.data !== undefined) {
           this._gotoTop('.proJuli', 0)
         }
       },
-      openDate(){
-        this.timeVisible = true;
+      openDate () {
+        this.timeVisible = true
       },
       choseAdd: function () { // 选择地址弹层，打开弹层
         this.islayout = true
@@ -234,10 +253,15 @@
         this.istoggHeight = false
         this.islayout = false
         // this.showDeter = false
-        if (this.currentSelected==='sender')
-          this.sendAddress = this.Province + ' ' + this.City + ' ' + this.District + ' ' + this.Street;
-        if (this.currentSelected==='receiver')
-          this.receiveAddress = this.Province + ' ' + this.City + ' ' + this.District + ' ' + this.Street;
+        if (this.currentSelected === 'sender') {
+          this.sendAddress = this.Province + ' ' + this.City + ' ' + this.District;
+          this.sendString = this.Province + '-' + this.City + '-' + this.District
+        }
+        if (this.currentSelected === 'receiver') {
+          this.receiveAddress = this.Province + ' ' + this.City + ' ' + this.District;
+          this.receiveString = this.Province + '-' + this.City + '-' + this.District;
+        }
+
       },
       _newArr (arr, selectid) {
         for (var i = 0; i < arr.length; i++) {
@@ -358,11 +382,11 @@
         this.titleIndex = Number
         this.district = code
         this.District = input
-        this.showProvince = false
-        this.showCity = false
-        this.showDistrict = false
-        this.showStreet = true
-        this.showStreetList = zmGetStreetArr(code);
+        // this.showProvince = false
+        // this.showCity = false
+        // this.showDistrict = false
+        // this.showStreet = true
+        this.showStreetList = zmGetStreetArr(code)
         // 选择当前添加active
         // this.showDistrictList.map(a => { a.selected = false })
         // this.showDistrictList[index].selected = true
@@ -372,9 +396,10 @@
         this.oneac = false // 给第一个nav去掉高亮
         this.twoac = false // 给第二个nav去除高亮
         this.threeac = false // 给第三个nav添加高亮
-        this.fourac = true
-        this.fourshow = true // 给第四个nav显示
+        // this.fourac = true
+        // this.fourshow = true // 给第四个nav显示
         this.showDeter = false
+        this.determine()
       },
       districtSelected: function () { // 第三个选择
         // console.log('点击了第三个nav')
@@ -393,103 +418,191 @@
           })
         }
       },
-      getStreetId: function (code, input, index) {
-        this.titleIndex = Number
-        this.street = code
-        this.Street = input
-        // 选择当前添加active
-        // this.showDistrictList.map(a => { a.selected = false })
-        // this.showDistrictList[index].selected = true
-        // 选取市区选项之后关闭弹层
-        this.oneac = false // 给第一个nav去掉高亮
-        this.showDeter = true
-        this.determine()
+      // getStreetId: function (code, input, index) {
+      //   this.titleIndex = Number
+      //   this.street = code
+      //   this.Street = input
+      //   // 选择当前添加active
+      //   // this.showDistrictList.map(a => { a.selected = false })
+      //   // this.showDistrictList[index].selected = true
+      //   // 选取市区选项之后关闭弹层
+      //   this.oneac = false // 给第一个nav去掉高亮
+      //   this.showDeter = true
+      //   this.determine()
+      // },
+      // streetSelected: function () { // 第四个选择
+      //   // console.log('点击了第三个nav')
+      //   this.showProvince = false
+      //   this.showCity = false
+      //   this.showDistrict = false
+      //   this.showStreet = true
+      //
+      //   this.oneac = false // 给第一个nav添加高亮
+      //   this.twoac = false // 给第二个nav去除高亮
+      //   this.threeac = false // 给第三个nav去掉高亮
+      //   this.fourac = true
+      //   if (this.$route.query.data !== undefined) {
+      //     this.$nextTick(() => { // 让li标签回到顶部
+      //       this._gotoTop('.strJuli', 2)
+      //     })
+      //   }
+      // },
+      isdefault () {
+        console.log(this.value)
       },
-      streetSelected: function () { // 第四个选择
-        // console.log('点击了第三个nav')
-        this.showProvince = false
-        this.showCity = false
-        this.showDistrict = false
-        this.showStreet = true
+      addWeight () {
+        this.goodsweight += 1
+      },
+      reduceWeight () {
+        this.goodsweight = this.goodsweight - 1
+      },
+      selectday (obj) {
+        this.day = obj
+      },
+      selectHour (hour, id) {
+        document.getElementById('one').style.color = 'black'
+        document.getElementById('two').style.color = 'black'
+        document.getElementById('three').style.color = 'black'
+        document.getElementById('four').style.color = 'black'
+        document.getElementById('five').style.color = 'black'
+        document.getElementById(id).style.color = 'blue'
+        if (this.day === 'today') {
+          this.noticetime = '预约 今天 ' + hour;
+          this.timeString = this.getFormatDate(new Date())+' '+hour.split("-")[0];
+          console.log(this.timeString)
+        } else if (this.day === 'tomorrow') {
+          this.noticetime = '预约 明天 ' + hour;
+          this.timeString = this.getDay(1,'-')+' '+hour.split("-")[0];
+        } else if (this.day === 'afterday') {
+          this.noticetime = '预约 后天 ' + hour
+          this.timeString = this.getDay(2,'-')+' '+hour.split("-")[0];
+        }
+        this.timeVisible = false
+      },
+      //获取当前时间，格式YYYY-MM-DD
+      getFormatDate (date) {
+        let seperator1 = '-';
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+          month = '0' + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+          strDate = '0' + strDate;
+        }
+        let currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+      },
+      getDay(num,str){
+        let day = new Date();
+        let nowTime = day.getTime();
+        let ms = 24*3600*1000*num;
+        day.setTime(parseInt(nowTime+ms));
+        let year = day.getFullYear();
+        let month = day.getMonth()+1;
+        let strDate = day.getDate();
+        if (month >= 1 && month <= 9) {
+          month = '0' + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+          strDate = '0' + strDate;
+        }
+        let result = year + str + month + str + strDate;
+        return result;
+      },
+      inittime () {
+        let current = new Date()
+        let hour = current.getHours()
+        if (hour < 9) {
+          this.onedisable = false
+          this.twodisable = false
+          this.threedisable = false
+          this.fourdisable = false
+          this.fivedisable = false
+        } else if (hour < 11) {
+          this.onedisable = true
+          this.twodisable = false
+          this.threedisable = false
+          this.fourdisable = false
+          this.fivedisable = false
+        } else if (hour < 13) {
+          this.onedisable = true
+          this.twodisable = true
+          this.threedisable = false
+          this.fourdisable = false
+          this.fivedisable = false
+        } else if (hour < 15) {
+          this.onedisable = true
+          this.twodisable = true
+          this.threedisable = true
+          this.fourdisable = false
+          this.fivedisable = false
+        } else if (hour < 17) {
+          this.onedisable = true
+          this.twodisable = true
+          this.threedisable = true
+          this.fourdisable = true
+          this.fivedisable = false
+        } else {
+          this.onedisable = true
+          this.twodisable = true
+          this.threedisable = true
+          this.fourdisable = true
+          this.fivedisable = true
+        }
+      },
+      getlocation (val) {
+        //获取当前位置
+        var geolocation = new BMap.Geolocation()
+        geolocation.getCurrentPosition((r) => {
+          if (geolocation.getStatus() == BMAP_STATUS_SUCCESS) {
+            this.userlocation = r.point
+            let self = this
+            this.$axios.get(this.$store.state.url+'/tss/geocoder?longitude=+' + this.userlocation.lng + '&latitude=' + this.userlocation.lat).then(function (res) {
+              if (res.data.data.status == 0) {
+                self.setAddress(val, res.data.data.result.addressComponent)
+              } else {
+                Toast({
+                  message: '获取定位失败',
+                  position: 'middle',
+                  duration: 1500
+                })
+              }
+            })
+          } else {
+            Toast({
+              message: '定位失败' + this.getStatus(),
+              position: 'middle',
+              duration: 1500
+            })
+          }
+        })
+      },
+      setAddress (val, data) {
+        this.Province = data.province
+        this.City = data.city
+        this.District = data.district
+        if (val === 'send') {
+          this.sendAddress = data.province + ' ' + data.city + ' ' + data.district
+          this.sendString = data.province + '-' + data.city + '-' + data.district
+        }
 
-        this.oneac = false // 给第一个nav添加高亮
-        this.twoac = false // 给第二个nav去除高亮
-        this.threeac = false // 给第三个nav去掉高亮
-        this.fourac = true
-        if (this.$route.query.data !== undefined) {
-          this.$nextTick(() => { // 让li标签回到顶部
-            this._gotoTop('.strJuli', 2)
-          })
+
+        if (val === 'receive') {
+          this.receiveAddress = data.province + ' ' + data.city + ' ' + data.district
+          this.receiveString = data.province + '-' + data.city + '-' + data.district
         }
+
       },
-      isdefault(){
-        console.log(this.value);
-      },
-      addWeight(){
-        this.goodsweight += 1;
-      },
-      reduceWeight(){
-        this.goodsweight = this.goodsweight-1;
-      },
-      selectday(obj){
-        this.day = obj;
-      },
-      selectHour(hour,id){
-        document.getElementById("one").style.color = 'black';
-        document.getElementById("two").style.color = 'black';
-        document.getElementById("three").style.color = 'black';
-        document.getElementById("four").style.color = 'black';
-        document.getElementById("five").style.color = 'black';
-        document.getElementById(id).style.color = 'blue';
-        if (this.day==='today'){
-          this.noticetime = "预约 今天 "+hour;
-        } else if (this.day==='tomorrow'){
-          this.noticetime = "预约 明天 "+hour;
-        } else if (this.day==='afterday'){
-          this.noticetime = "预约 后天 "+hour;
-        }
-        this.timeVisible = false;
-      },
-      inittime(){
-        let current = new Date();
-        let hour = current.getHours();
-        if (hour<9){
-          this.onedisable=false;
-          this.twodisable=false;
-          this.threedisable=false;
-          this.fourdisable=false;
-          this.fivedisable=false;
-        } else if(hour<11){
-          this.onedisable=true;
-          this.twodisable=false;
-          this.threedisable=false;
-          this.fourdisable=false;
-          this.fivedisable=false;
-        } else if(hour<13){
-          this.onedisable=true;
-          this.twodisable=true;
-          this.threedisable=false;
-          this.fourdisable=false;
-          this.fivedisable=false;
-        } else if(hour<15){
-          this.onedisable=true;
-          this.twodisable=true;
-          this.threedisable=true;
-          this.fourdisable=false;
-          this.fivedisable=false;
-        } else if(hour<17){
-          this.onedisable=true;
-          this.twodisable=true;
-          this.threedisable=true;
-          this.fourdisable=true;
-          this.fivedisable=false;
-        } else{
-          this.onedisable=true;
-          this.twodisable=true;
-          this.threedisable=true;
-          this.fourdisable=true;
-          this.fivedisable=true;
-        }
+      toestimate () {
+        let self = this
+        this.$axios.get(this.$store.state.url+"/tss/estimate?from="+this.sendString+"&to="+this.receiveString+"&weight="+this.goodsweight+"&time="+this.timeString).then(function (res) {
+          if (res.data.code==999) {
+            self.$store.dispatch("setPriceResult",JSON.stringify(res.data.data.data));
+            self.$router.push("/priceResult")
+          }
+        })
       }
     },
     beforeDestroy () {
@@ -499,7 +612,7 @@
 </script>
 
 <style scoped>
-  #sender,#receiver{
+  #sender, #receiver {
     width: 100%;
     height: 70px;
     margin-top: 5px;
@@ -508,11 +621,12 @@
     justify-content: center;
     align-items: center;
   }
-  #receiver{
+
+  #receiver {
     margin-bottom: 5px;
   }
 
-  #sendword,#receiveword{
+  #sendword, #receiveword {
     /*border: 1px solid red;*/
     width: 15%;
     height: 100%;
@@ -522,7 +636,8 @@
     justify-content: center;
     align-items: center;
   }
-  .word{
+
+  .word {
     width: 38px;
     height: 38px;
     line-height: 38px;
@@ -533,7 +648,8 @@
     -moz-border-radius: 50%;
     text-align: center;
   }
-  .noaddress p{
+
+  .noaddress p {
     height: 70px;
     margin: 0;
     text-align: left;
@@ -542,13 +658,16 @@
     line-height: 70px;
     letter-spacing: 5px;
   }
-  input:focus{
+
+  input:focus {
     outline: none;
   }
-  .addAddress{
+
+  .addAddress {
     display: flex;
     width: 93%;
   }
+
   .addAddress input {
     float: left;
     width: 93%;
@@ -560,14 +679,16 @@
     margin: 0;
     font-size: 16px;
   }
-  #senddis,#receivedis{
+
+  #senddis, #receivedis {
     background-color: white;
     overflow: auto;
     height: 41px;
     width: 85%;
     display: flex;
   }
-  .loca{
+
+  .loca {
     width: 7%;
     float: left;
     height: 35px;
@@ -576,107 +697,135 @@
     align-items: center;
   }
 
-  .ac{color: #000!important;border-bottom: 0.02rem solid #fff!important;}
-  .myAddress{
+  .ac {
+    color: #000 !important;
+    border-bottom: 0.02rem solid #fff !important;
+  }
+
+  .myAddress {
     width: 100%;
     background-color: white;
-    border-top: 4px solid rgba(245,245,245,1);
-    color:#333;
+    border-top: 4px solid rgba(245, 245, 245, 1);
+    color: #333;
   }
-  .proJuli,.citJuli,.disJuli,.strJuli{
+
+  .proJuli, .citJuli, .disJuli, .strJuli {
     margin: 0;
     padding: 0;
   }
-  .myAddress .cont{
-    border-bottom: 1px solid rgba(245,245,245,0.8);
+
+  .myAddress .cont {
+    border-bottom: 1px solid rgba(245, 245, 245, 0.8);
   }
-  .myAddress .cont span{
+
+  .myAddress .cont span {
     display: inline-block;
     font-size: 0.28rem;
     color: #333;
     line-height: 0.88rem;
     margin-left: 0.32rem;
   }
-  .myAddress .cont section{
-    float:left;
+
+  .myAddress .cont section {
+    float: left;
   }
-  .myAddress .cont p{
+
+  .myAddress .cont p {
     display: inline-block;
     font-size: 0.28rem;
     color: #333333;
     line-height: 0.88rem;
     margin-left: 1rem;
   }
-  .myAddress .cont .pic2{
+
+  .myAddress .cont .pic2 {
     float: right;
     width: 0.14rem;
     height: 0.24rem;
     margin: 0.32rem 0.32rem 0.32rem 0;
   }
-  .myAddress .cont p.text{
+
+  .myAddress .cont p.text {
     margin-left: 0.72rem;
   }
-  .address{
-    position:absolute;
-    bottom:0;
-    left:0;
-    z-index:121;
-    background:#fff;
-    width:100%;
+
+  .address {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 121;
+    background: #fff;
+    width: 100%;
     height: 0;
     overflow: hidden;
     transition: height .5s;
   }
-  .toggHeight{
+
+  .toggHeight {
     height: 385px;
   }
-  .layout{
-    width:100%;
-    height:100%;
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:120;
+
+  .layout {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 120;
     opacity: 0;
     transition: all .5s;
-    background:rgb(53, 58, 60);
+    background: rgb(53, 58, 60);
     visibility: hidden;
   }
-  .layoutBg{opacity: .7; visibility: visible;}
-  .area{
+
+  .layoutBg {
+    opacity: .7;
+    visibility: visible;
+  }
+
+  .area {
     float: left;
-    display:inline-block;
-    font-size:14px;
+    display: inline-block;
+    font-size: 14px;
     height: 24px;
-    line-height:24px;
-    margin-left:21px;
-    color:#262e31;
+    line-height: 24px;
+    margin-left: 21px;
+    color: #262e31;
     margin-top: 15px;
-    max-width: calc(100% - 80%);overflow: hidden;text-overflow: ellipsis;white-space: nowrap;
+    max-width: calc(100% - 80%);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .addList{
+
+  .addList {
     margin-left: 20px;
-    font-size:15px;
-    line-height:33px;
-    color:#262e31;
+    font-size: 15px;
+    line-height: 33px;
+    color: #262e31;
   }
+
   /* 修改的格式 */
-  .address ul{
+  .address ul {
     height: calc(100% - .82rem);
-    overflow:auto;
+    overflow: auto;
   }
-  .address ul li{
+
+  .address ul li {
     list-style: none;
     text-align: left;
   }
-  .address .title .accolor{
+
+  .address .title .accolor {
     color: #d2a24e;
-    border-bottom:0.04rem solid #d2a24e;
+    border-bottom: 0.04rem solid #d2a24e;
   }
-  .address ul .active{
-    color:#d2a24e;
+
+  .address ul .active {
+    color: #d2a24e;
   }
-  .address ul .active span::after{
+
+  .address ul .active span::after {
     content: '';
     background-image: url(../assets/img/gou_img.png);
     width: .4rem;
@@ -686,11 +835,13 @@
     background-position: left .16rem center;
     display: inline-block;
   }
-  .title{
+
+  .title {
     height: 40px;
     border-bottom: .01rem solid #8a96a3;
   }
-  .determine{
+
+  .determine {
     display: inline-block;
     width: .75rem;
     text-align: center;
@@ -701,7 +852,8 @@
     color: #d2a24e;
     font-size: .28rem;
   }
-  .mybtn{
+
+  .mybtn {
     width: 30px;
     height: 30px;
     margin: 0px 18px;
@@ -711,59 +863,71 @@
     border: 1px solid dodgerblue;
     color: dodgerblue;
   }
-  .mybtn:focus{
+
+  .mybtn:focus {
     outline: none;
   }
-  .spanword{
+
+  .spanword {
     color: black;
     letter-spacing: 3px;
   }
-  .btndisabled{
+
+  .btndisabled {
     border: 1px solid darkgrey;
     color: darkgrey;
     pointer-events: none;
   }
-  .poptitle{
+
+  .poptitle {
     text-align: center;
   }
-  .timeTitle{
+
+  .timeTitle {
     text-align: center;
     height: 50px;
     margin: 0;
     line-height: 50px;
   }
-  #appTime{
+
+  #appTime {
     width: 100%;
     height: 300px;
     display: flex;
     border-top: 1px solid lightgrey;
   }
-  #appDay{
+
+  #appDay {
     width: 38%;
     display: flex;
     flex-direction: column;
     background-color: whitesmoke;
   }
-  #appHour{
+
+  #appHour {
     width: 62%;
     display: flex;
   }
-  .appdaydiv{
+
+  .appdaydiv {
     height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: whitesmoke;
   }
-  .appday{
+
+  .appday {
     background-color: white;
     color: blue;
   }
-  ul{
+
+  ul {
     padding: 0;
     margin: 0;
   }
-  .timeli{
+
+  .timeli {
     list-style: none;
     width: 222px;
     height: 40px;
@@ -773,7 +937,8 @@
     letter-spacing: 2px;
     border-bottom: 1px solid lightgrey;
   }
-  .disable{
+
+  .disable {
     list-style: none;
     width: 222px;
     height: 40px;
@@ -785,10 +950,12 @@
     pointer-events: none;
     color: darkgrey;
   }
-  .selected{
+
+  .selected {
     color: blue;
   }
-  li img{
+
+  li img {
     margin-left: 70px;
   }
 </style>

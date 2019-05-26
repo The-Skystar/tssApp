@@ -5,7 +5,7 @@
       <div id="sendword">
         <p class="word">寄</p>
       </div>
-      <div id="sendaddress" v-show="issend^false">
+      <div id="sendaddress" v-show="issend^false" @click="editSender">
         <div class="nametel">
           <p class="sendname">{{sendname}}&#8195;{{sendtel}}</p>
         </div>
@@ -16,33 +16,35 @@
           <p class="sendaddress">{{sendaddress}}</p>
         </div>
       </div>
-      <div class="noaddress" v-show="issend^true">
+      <div class="noaddress" v-show="issend^true" @click="editSender">
         <p>寄件人信息</p>
       </div>
       <div id="sendico">
-        <img src="../../static/data.png" class="ico">
+        <!--<img src="../../static/data.png" class="ico">-->
+        <mt-cell is-link></mt-cell>
       </div>
     </div>
     <div id="receiver">
       <div id="receiveword">
         <p class="word" style="background-color: limegreen">收</p>
       </div>
-      <div id="receiveaddress" v-show="isreceive^false">
+      <div id="receiveaddress" v-show="isreceive^false" @click="editReceiver">
         <div class="nametel">
-          <p class="sendname">{{sendname}}&#8195;{{sendtel}}</p>
+          <p class="sendname">{{receivername}}&#8195;{{receivertel}}</p>
         </div>
         <div class="dis">
-          <p class="senddis">{{senddis}}</p>
+          <p class="senddis">{{receiverdis}}</p>
         </div>
         <div class="addr">
-          <p class="sendaddress">{{sendaddress}}</p>
+          <p class="sendaddress">{{receiveraddress}}</p>
         </div>
       </div>
-      <div class="noaddress" v-show="isreceive^true">
+      <div class="noaddress" v-show="isreceive^true" @click="editReceiver">
         <p>寄件人信息</p>
       </div>
       <div id="receiveico">
-        <img src="../../static/data.png" class="ico">
+        <!--<img src="../../static/data.png" class="ico">-->
+        <mt-cell is-link></mt-cell>
       </div>
     </div>
     <div @click="openPopup">
@@ -78,9 +80,9 @@
       </table>
     </mt-popup>
     <mt-cell title="重量" align="left">
-      <button :class="goodsweight===1?'btndisabled':''" @click="reduceWeight">-</button>
+      <button class="btn" :class="goodsweight===1?'btndisabled':''" @click="reduceWeight">-</button>
       <span class="spanword">{{goodsweight}}&nbsp;kg</span>
-      <button @click="addWeight">+</button>
+      <button class="btn" @click="addWeight">+</button>
     </mt-cell>
     <div @click="opennum">
       <mt-cell title="包裹数量" align="left" style="padding-left: 0px" @click="addWeight">
@@ -132,13 +134,15 @@
         </div>
       </mt-popup>
     </div>
-    <mt-cell is-link title="备注" v-model="remark" align="left"></mt-cell>
+    <mt-cell is-link to="/remark" title="备注" v-model="remark" align="left"></mt-cell>
+    <mt-button size="large" type="primary" @click="createOrder">提交订单</mt-button>
     <footer-bar :selected="selected" :tabs="tabs"></footer-bar>
   </div>
 </template>
 
 <script>
   import footer from '../components/Footbar'
+  import {Toast} from 'mint-ui'
   export default {
     name: 'index',
     components:{
@@ -148,16 +152,22 @@
       return{
         selected:'MainPage',
         tabs: [require("../assets/img/home_selected.png"),require("../assets/img/tool.png"), require("../assets/img/user.png")],
-        sendname: '杨向军',
-        sendtel: '13797514657',
-        senddis: '湖北省 荆州市 荆州区 城南街道',
-        sendaddress: '南环路一号汉科学苑4#227',
-        issend: true,
-        isreceive: false,
+        issend: this.$store.state.addrStatus.sender,
+        isreceive: this.$store.state.addrStatus.receiver,
+        sendname: this.$store.state.addrStatus.sender?JSON.parse(this.$store.state.sender).contact:'',
+        sendtel: this.$store.state.addrStatus.sender?JSON.parse(this.$store.state.sender).phone:'',
+        senddis: this.$store.state.addrStatus.sender?JSON.parse(this.$store.state.sender).district:'',
+        sendaddress: this.$store.state.addrStatus.sender?JSON.parse(this.$store.state.sender).address:'',
+        receivername: this.$store.state.addrStatus.receiver?JSON.parse(this.$store.state.receiver).contact:'',
+        receivertel: this.$store.state.addrStatus.receiver?JSON.parse(this.$store.state.receiver).phone:'',
+        receiverdis: this.$store.state.addrStatus.receiver?JSON.parse(this.$store.state.receiver).district:'',
+        receiveraddress: this.$store.state.addrStatus.receiver?JSON.parse(this.$store.state.receiver).address:'',
         popupVisible: false,
         goodstype: '日用品',
         goodsseleted: 'ry',
         noticetime: '',
+        startTime:'',
+        endTime:'',
         timeVisible: false,
         day: 'today',
         onedisable: false,
@@ -168,13 +178,13 @@
         goodsweight:1,
         shownum: false,
         goodsnum:'选填',
-        remark:'',
+        remark:this.$store.state.remark,
         numbers:[
           {
             values:['选填','1','2','3','4','5','6'],
           }
         ],
-
+        isnoctice:'0',
       }
     },
     created(){
@@ -217,8 +227,20 @@
           this.fourdisable=true;
           this.fivedisable=true;
         }
+        // this.issend = this.$store.state.addrStatus.sender;
+        // this.isreceive = this.$store.state.addrStatus.receiver;
+        // this.sendname=this.issend?JSON.parse(this.$store.state.sender).contact:'';
+        // this.sendtel=this.issend?JSON.parse(this.$store.state.sender).phone:'';
+        // this.senddis=this.issend?JSON.parse(this.$store.state.sender).district:'';
+        // this.sendaddress=this.issend?JSON.parse(this.$store.state.sender).address:'';
+        // this.receivername=this.isreceive?JSON.parse(this.$store.state.receiver).contact:'';
+        // this.receivertel=this.isreceive?JSON.parse(this.$store.state.receiver).phone:'';
+        // this.receiverdis=this.isreceive?JSON.parse(this.$store.state.receiver).district:'';
+        // this.receiveraddress=this.isreceive?JSON.parse(this.$store.state.receiver).address:'';
     },
     mounted(){
+
+
     },
     methods:{
       openPopup(){
@@ -247,12 +269,36 @@
         document.getElementById(id).style.color = 'blue';
         if (this.day==='today'){
           this.noticetime = "预约 今天 "+hour;
+          this.startTime = this.getDay(0,'-')+' '+hour.split("-")[0]+":00";
+          this.endTime = this.getDay(0,'-')+' '+hour.split("-")[1]+":00";
         } else if (this.day==='tomorrow'){
           this.noticetime = "预约 明天 "+hour;
+          this.startTime = this.getDay(1,'-')+' '+hour.split("-")[0]+":00";
+          this.endTime = this.getDay(1,'-')+' '+hour.split("-")[1]+":00";
         } else if (this.day==='afterday'){
           this.noticetime = "预约 后天 "+hour;
+          this.startTime = this.getDay(2,'-')+' '+hour.split("-")[0]+":00";
+          this.endTime = this.getDay(2,'-')+' '+hour.split("-")[1]+":00";
         }
         this.timeVisible = false;
+        this.isnoctice = '1';
+      },
+      getDay(num,str){
+        let day = new Date();
+        let nowTime = day.getTime();
+        let ms = 24*3600*1000*num;
+        day.setTime(parseInt(nowTime+ms));
+        let year = day.getFullYear();
+        let month = day.getMonth()+1;
+        let strDate = day.getDate();
+        if (month >= 1 && month <= 9) {
+          month = '0' + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+          strDate = '0' + strDate;
+        }
+        let result = year + str + month + str + strDate;
+        return result;
       },
       addWeight(){
         this.goodsweight += 1;
@@ -262,6 +308,93 @@
       },
       selectNum(picker,val){
         this.goodsnum = val[0];
+      },
+      editSender(){
+        this.$store.dispatch('setSendCourier',true);
+        this.$store.dispatch('setRecipient','sender');
+        this.$router.push("/addres")
+      },
+      editReceiver(){
+        this.$store.dispatch('setSendCourier',true);
+        this.$store.dispatch('setRecipient','receiver');
+        this.$router.push("/addres")
+      },
+      createOrder(){
+        if (this.$store.state.isLogin) {
+          let user = JSON.parse(this.$store.state.currentUser);
+          let send = JSON.parse(this.$store.state.sender);
+          let receive = JSON.parse(this.$store.state.receiver)
+          let sender = {
+            "type":'1',
+            "name":send.contact,
+            "phone":send.phone,
+            "postCode":send.postcode,
+            "province":send.province,
+            "city":send.city,
+            "county":send.county,
+            "street":send.street,
+            "address":send.address
+          };
+          let receiver = {
+            "type":'2',
+            "name":receive.contact,
+            "phone":receive.phone,
+            "postCode":receive.postcode,
+            "province":receive.province,
+            "city":receive.city,
+            "county":receive.county,
+            "street":receive.street,
+            "address":receive.address
+          };
+          let goods = {
+            "goodsType":this.goodsseleted,
+            "numb":Number(this.goodsnum),
+            "weight":this.goodsweight,
+          };
+          let params = {
+            "userId": user.userId,
+            "isNotice":this.isnoctice,
+            "startTime":this.startTime,
+            "endTime":this.endTime,
+            "remark":this.remark,
+            "sender":sender,
+            "receiver":receiver,
+            "goods":goods,
+          }
+          let config = {
+            headers:{
+              "token":sessionStorage.getItem("token"),
+              "userId":JSON.parse(this.$store.state.currentUser).userId,
+              "Content-Type":"application/json"
+            }
+          }
+          console.log(params)
+          let self = this;
+          this.$axios.post(this.$store.state.url+"/tss/create",params,config).then(function (res) {
+            if (res.data.code===500){
+              Toast({
+                message:'系统错误',
+                position:'middle',
+                duration:1500
+              })
+            }else if(res.data.code===999){
+              self.$router.push("/tool")
+              Toast({
+                message:'下单成功',
+                position:'middle',
+                duration:1500
+              })
+            }
+            console.log(res.data)
+          })
+        }else{
+          Toast({
+            message:'您还没有登录',
+            position:'middle',
+            duration:1500
+          })
+          setTimeout(function (){self.$router.push("/login")},1500);
+        }
       }
     }
   }
@@ -302,6 +435,7 @@
   }
   #sendico,#receiveico{
     /*border: 1px solid red;*/
+    background-color: white;
     width: 12%;
     height: 100%;
     display: inline-flex;
@@ -431,7 +565,7 @@
   li img{
     margin-left: 70px;
   }
-  button{
+  .btn{
     width: 30px;
     height: 30px;
     margin: 0px 12px;
@@ -441,7 +575,7 @@
     border: 1px solid dodgerblue;
     color: dodgerblue;
   }
-  button:focus{
+  .btn:focus{
     outline: none;
   }
   .spanword{

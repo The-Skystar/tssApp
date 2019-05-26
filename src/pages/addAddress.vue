@@ -4,9 +4,10 @@
         <router-link to="/addres" slot="left">
           <mt-button icon="back"></mt-button>
         </router-link>
+        <mt-button slot="right" @click="addAddress">保存</mt-button>
       </mt-header>
       <div id="name">
-        <p>收货人</p>
+        <p>联系人</p>
         <input type="text" placeholder="请填写收货人姓名" v-model="sender">
       </div>
       <div class="bottomLine"></div>
@@ -20,7 +21,7 @@
         <div class="addAddress" @click="choseAdd()">
           <input type="text" placeholder="省市区县、镇等" class="txtmangth" disabled="disabled" v-model="userAddress">
         </div>
-        <div class="loca" @click="getlocation"><i class="fa fa-map-marker" aria-hidden="true"></i></div>
+        <div class="loca" @click="getlocation"><img src="../assets/img/loc1.jpg" style="width: 35px;height: 35px"/></div>
 
       </div>
       <div class="bottomLine"></div>
@@ -35,7 +36,7 @@
         </mt-cell>
       </div>
       <div class="bottomLine"></div>
-      <mt-button size="large" type="primary" @click="addAddress">新增地址</mt-button>
+      <!--<mt-button size="large" type="primary" @click="addAddress">添加地址</mt-button>-->
       <section class="address" :class="{toggHeight:istoggHeight}">
         <section class="title">
           <div class="area" @click="provinceSelected()" :class="[oneac ? 'accolor' : '']">{{Province?Province:'请选择'}}</div>
@@ -114,12 +115,14 @@
         address:'',
         defaultAddr:'0',
         userlocation: { lng: "", lat: "" },
+        postCode:'',
       }
     },
     mounted () {
       document.querySelector('body').style.backgroundColor = '#f5f7fa';
     },
     created () {
+      this.init()
       if (this.$route.query.data !== undefined) { // 如果是点击编辑地址过来，则执行...当然了，不一定非要用路由传参的方式，你也可以用本地存储，反正能证明你是点击了编辑地址过来就好
         this.showDeter = true
         this.headerTxt = '编辑收货地址'
@@ -154,6 +157,19 @@
       }
     },
     methods: {
+      init(){
+        let address = JSON.parse(this.$store.state.userAddress.addressSelected)
+        if (address!=null){
+          this.sender = address.contact
+          this.phone = address.phone
+          this.Province = address.province
+          this.City = address.city
+          this.District = address.county
+          this.street = address.street
+          this.address = address.address
+          this.userAddress = this.Province + ' ' + this.City + ' ' + this.District + ' ' + this.Street
+        }
+      },
       choseAdd: function () { // 选择地址弹层，打开弹层
         this.islayout = true
         this.istoggHeight = true
@@ -168,7 +184,7 @@
       determine () {
         this.istoggHeight = false
         this.islayout = false
-        // this.showDeter = false
+        this.getPostcode(this.district)
         this.userAddress = this.Province + ' ' + this.City + ' ' + this.District + ' ' + this.Street
       },
       _newArr (arr, selectid) {
@@ -360,37 +376,113 @@
         else this.defaultAddr = '0';
       },
       addAddress(){
-        let params = {
-          "userId":JSON.parse(this.$store.state.currentUser).userId,
-          "contact":this.sender,
-          "phone":this.phone,
-          "province":this.province,
-          "city":this.city,
-          "county":this.county,
-          "street":this.street,
-          "address":this.address,
-          "isDefault":this.defaultAddr
-        };
-        let config = {
-          headers:{
-            "token":sessionStorage.getItem("token"),
-            "userId":JSON.parse(this.$store.state.currentUser).userId
+        if (this.$store.state.isSendCourier){
+          let params = {
+            "contact":this.sender,
+            "phone":this.phone,
+            "province":this.Province,
+            "city":this.City,
+            "county":this.District,
+            "street":this.Street,
+            "district":this.userAddress,
+            "address":this.address,
+            "isDefault":this.defaultAddr,
+            "districtCode":this.district,
+            "postcode":this.postCode,
+          };
+          if (this.$store.state.recipient==='sender'){
+            this.$store.dispatch("setSender",JSON.stringify(params));
+            this.$store.dispatch("setSendCourier",false);
+            this.$store.dispatch("setSenderStatus",true);
+            console.log(params)
+            this.$router.push("/");
+          } else if (this.$store.state.recipient==='receiver'){
+            this.$store.dispatch("setReceiver",JSON.stringify(params));
+            this.$store.dispatch("setSendCourier",false);
+            this.$store.dispatch("setReceiverStatus",true);
+            this.$router.push("/");
           }
-        };
-        let self = this;
-        this.$axios.post("/tss/createAddress",this.qs.stringify(params),config).then(function (res) {
-            console.log(res.data);
-        }).catch(function (error) {
-          if (error.response.status==401) {
-            Toast({
-              message:'您还未登录！',
-              position:'middle',
-              duration:2000
+        } else {
+          let address = this.$store.state.userAddress.addressSelected
+          if (address !== null&&address.length!==0) {
+            address = JSON.parse(address)
+            let params = {
+              "addressId": address.addressId,
+              "userId": address.userId,
+              "contact": this.sender,
+              "phone": this.phone,
+              "province": this.Province,
+              "city": this.City,
+              "county": this.District,
+              "street": this.Street,
+              "address": this.address,
+              "isDefault": this.defaultAddr,
+              "postcode": address.postcode
+            };
+            let config = {
+              headers: {
+                "token": sessionStorage.getItem("token"),
+                "userId": JSON.parse(this.$store.state.currentUser).userId
+              }
+            };
+            let self = this;
+            this.$axios.post(this.$store.state.url + "/tss/upd", this.qs.stringify(params), config).then(function (res) {
+              if (res.data.code == 302) {
+                self.$router.push("/addres")
+              } else {
+                Toast({
+                  message: '修改失败！',
+                  position: 'middle',
+                  duration: 2000
+                })
+              }
+            }).catch(function (res) {
+              Toast({
+                message: '修改失败！',
+                position: 'middle',
+                duration: 2000
+              })
             })
-            setTimeout(function (){self.$router.push("/login")},2000);
+          } else {
 
+            let params = {
+              "userId": JSON.parse(this.$store.state.currentUser).userId,
+              "contact": this.sender,
+              "phone": this.phone,
+              "province": this.Province,
+              "city": this.City,
+              "county": this.District,
+              "street": this.Street,
+              "address": this.address,
+              "isDefault": this.defaultAddr,
+              "postcode": this.postCode
+            };
+            let config = {
+              headers: {
+                "token": sessionStorage.getItem("token"),
+                "userId": JSON.parse(this.$store.state.currentUser).userId
+              }
+            };
+            let self = this;
+            this.$axios.post(this.$store.state.url + "/tss/createAddress", this.qs.stringify(params), config).then(function (res) {
+              if (res.data.code == 300) {
+                self.$router.push("/addres")
+              }
+            }).catch(function (error) {
+              if (error.response.status == 401) {
+                Toast({
+                  message: '您还未登录！',
+                  position: 'middle',
+                  duration: 2000
+                })
+                setTimeout(function () {
+                  self.$router.push("/login")
+                }, 2000);
+
+              }
+            })
           }
-        })
+        }
       },
       getlocation () {
         //获取当前位置
@@ -399,9 +491,11 @@
           if(geolocation.getStatus() == BMAP_STATUS_SUCCESS){
             this.userlocation = r.point;
             let self = this;
-            this.$axios.get("/tss/geocoder?longitude=+"+this.userlocation.lng+"&latitude="+this.userlocation.lat).then(function (res) {
+            this.$axios.get(this.$store.state.url+"/tss/geocoder?longitude=+"+this.userlocation.lng+"&latitude="+this.userlocation.lat).then(function (res) {
               if (res.data.data.status==0){
+                self.getPostcode(res.data.data.result.addressComponent.adcode);
                 self.setAddress(res.data.data.result.addressComponent);
+                console.log(self.postCode)
               }else{
                 Toast({
                   message: '获取定位失败',
@@ -420,10 +514,17 @@
         });
       },
       setAddress(data){
-        this.province = data.province;
-        this.city = data.city;
-        this.district = data.district;
-        this.userAddress = data.province + ' ' + data.city + ' ' + data.district;
+        this.Province = data.province;
+        this.City = data.city;
+        this.District = data.district;
+        this.Street = data.street
+        this.userAddress = data.province + ' ' + data.city + ' ' + data.district + '' +data.street;
+      },
+      getPostcode(districtCode){
+        let self = this;
+        this.$axios.get(this.$store.state.url+"/tss/postcode?districtCode="+districtCode+"000000").then(function (res) {
+          self.postCode =  res.data.data;
+        })
       }
     },
     beforeDestroy () {
@@ -462,8 +563,10 @@
   .loca{
     width: 7%;
     float: left;
-    padding-top: 9px;
     height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   input{
     float: left;

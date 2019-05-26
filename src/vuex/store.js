@@ -14,6 +14,17 @@ export default new Vuex.Store({
     isLogin:false,   //判断当前用户是否已经登录
     isAuthen:false,
     validateInfo:null,
+    isSendCourier:false,
+    sender:null,
+    receiver:null,
+    recipient:'',
+    addrStatus:{sender:false,receiver: false},
+    remark:'',
+    userAddress:{addressInfo:null,addressSelected:null},
+    pay:'',
+    priceResult:null,
+    url:'http://10.156.85.170:8088'
+    // url:'/api'
   },
   getters,
   mutations,

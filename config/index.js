@@ -12,10 +12,17 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api':{
-        target: "http://127.0.0.1:8088",
+        target: "http://172.16.120.50:8088",
         changeOrigin:true,
         pathRewrite:{
           '^/api':''
+        }
+      },
+      '/pay':{
+        target: "http://10.156.85.170:8082",
+        changeOrigin:true,
+        pathRewrite:{
+          '^/pay':''
         }
       },
       // '/api1':{
@@ -66,6 +73,17 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
+    changeOrigin:true,
+    proxyTable: {
+
+      // '/api1':{
+      //   target: "http://127.0.0.1:8088",
+      //   changeOrigin:true,
+      //   pathRewrite:{
+      //     '^/api1':''
+      //   }
+      // }
+    },
 
     /**
      * Source Maps

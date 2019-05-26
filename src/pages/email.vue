@@ -40,7 +40,7 @@
             "column":"email",
             "value":this.email
           }
-          this.$axios.post("/tss/validate",this.qs.stringify(params)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/validate",this.qs.stringify(params)).then(function (res) {
             if (res.data.code==112) {
               self.emailstate = "success";
             }else if (res.data.code==111){
@@ -75,7 +75,7 @@
         }else {
           let self = this;
           let param = {"email":this.email};
-          this.$axios.post("/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
             if (res.data.code==113){
               self.timer();
             }else {
@@ -101,7 +101,7 @@
             "userId":JSON.parse(this.$store.state.currentUser).userId
           }
         }
-        this.$axios.post("/tss/updUser",this.qs.stringify(params),headers).then(function (res) {
+        this.$axios.post(this.$store.state.url+"/tss/updUser",this.qs.stringify(params),headers).then(function (res) {
           if (res.data.code==118){
             localStorage.setItem("user",JSON.stringify(res.data.data));
             self.$store.dispatch('setUser',JSON.stringify(res.data.data));

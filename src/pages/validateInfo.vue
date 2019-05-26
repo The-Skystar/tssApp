@@ -48,7 +48,7 @@
       }
     },
     created () {
-      let validate = JSON.parse(localStorage.getItem("validate"));
+      let validate = JSON.parse(localStorage.getItem(this.$store.state.currentUser.userId));
       this.name = validate.name;
       this.sex = validate.sex;
       this.famous = validate.famous;

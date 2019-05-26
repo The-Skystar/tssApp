@@ -63,15 +63,15 @@
               }
             };
             let self = this;
-            this.$axios.post("/tss/updPwd",self.qs.stringify(params),headers).then(function (res) {
+            this.$axios.post(this.$store.state.url+"/tss/updPwd",self.qs.stringify(params),headers).then(function (res) {
               if (res.data.code==120) {
                 let params ={
                   "str":user.userId,
                   "pwd":self.newPwd,
                 }
-                self.$axios.get("/tss/exit?userId="+user.userId).then(function (res) {
+                self.$axios.get(this.$store.state.url+"/tss/exit?userId="+user.userId).then(function (res) {
                   if (res.data.code==102) {
-                    self.$axios.post("/tss/pwdLogin",self.qs.stringify(params)).then(function (res) {
+                    self.$axios.post(this.$store.state.url+"/tss/pwdLogin",self.qs.stringify(params)).then(function (res) {
                       if (res.data.code!=100){
                         Toast({
                           message:'自动登录失败',
@@ -136,7 +136,7 @@
         }else {
           let self = this;
           let param = {"email":this.email};
-          this.$axios.post("/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
             if (res.data.code==113){
               self.timer();
             }else {
@@ -166,13 +166,13 @@
               }
             };
             let self = this;
-            this.$axios.post("/tss/updPwd",self.qs.stringify(params),headers).then(function (res) {
+            this.$axios.post(this.$store.state.url+"/tss/updPwd",self.qs.stringify(params),headers).then(function (res) {
               if (res.data.code==120) {
                 let params ={
                   "str":user.userId,
                   "pwd":self.newPwd,
                 }
-                self.$axios.get("/tss/exit?userId="+user.userId).then(function (res) {
+                self.$axios.get(this.$store.state.url+"/tss/exit?userId="+user.userId).then(function (res) {
                   if (res.data.code==102) {
                     self.$axios.post("/tss/pwdLogin",self.qs.stringify(params)).then(function (res) {
                       if (res.data.code!=100){

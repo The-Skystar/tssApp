@@ -19,6 +19,9 @@ import phone from '../pages/phone'
 import tel from '../pages/tel'
 import email from '../pages/email'
 import validateInfo from '../pages/validateInfo'
+import remark from '../pages/remark'
+import priceResult from '../pages/priceResult'
+import QRcode from '../pages/QrCode'
 
 Vue.use(Router)
 
@@ -102,6 +105,18 @@ export default new Router({
       path: '/validateInfo',
       name: 'validateInfo',
       component: validateInfo
+    },{
+      path: '/remark',
+      name: 'remark',
+      component: remark
+    },{
+      path: '/priceResult',
+      name: 'priceResult',
+      component: priceResult
+    },{
+      path: '/QRcode',
+      name: 'QRcode',
+      component: QRcode
     }
 
   ]

@@ -25,7 +25,7 @@
         let params = {
           "token":localStorage.getItem("token")
         }
-        this.$axios.post("/tss/autoLogin",this.qs.stringify(params)).then(function (res) {
+        this.$axios.post("http://10.156.85.170:8088/tss/autoLogin",this.qs.stringify(params)).then(function (res) {
           if (res.data.code==100){
             localStorage.setItem("user",JSON.stringify(res.data.data));
             localStorage.setItem("token",res.data.msg);

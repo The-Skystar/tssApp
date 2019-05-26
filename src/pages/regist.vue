@@ -48,7 +48,7 @@
             "column":"email",
             "value":this.email
           }
-          this.$axios.post("/tss/validate",this.qs.stringify(params)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/validate",this.qs.stringify(params)).then(function (res) {
             if (res.data.code==112) {
               self.emailstate = "success";
             }else if (res.data.code==111){
@@ -74,16 +74,23 @@
         }
       },
       sendCode(){
+
         if (this.email.length==0) {
           Toast({
             message: '亲，输入邮箱',
             position: 'middle',
             duration: 1000
           })
-        }else {
+        }else if (this.emailstate!=="success"){
+          Toast({
+            message: '邮箱已被占用',
+            position: 'middle',
+            duration: 1000
+          })
+        } else {
           let self = this;
           let param = {"email":this.email};
-          this.$axios.post("/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
             if (res.data.code==113){
               self.timer();
             }else {
@@ -105,13 +112,13 @@
             "ver":this.code,
             "pwd":this.pwd,
           };
-          this.$axios.post("/tss/reg",self.qs.stringify(params)).then(function (res) {
+          this.$axios.post(this.$store.state.url+"/tss/reg",self.qs.stringify(params)).then(function (res) {
             if (res.data.code==109) {
               let params ={
                 "str":self.email,
                 "pwd":self.pwd,
               }
-              self.$axios.post("/tss/pwdLogin",self.qs.stringify(params)).then(function (res) {
+              self.$axios.post(self.$store.state.url+"/tss/pwdLogin",self.qs.stringify(params)).then(function (res) {
                 if (res.data.code!=100){
                   Toast({
                     message:'自动登录失败',
@@ -150,6 +157,9 @@
 </script>
 
 <style scoped>
+  #regist{
+    text-align: center;
+  }
   .usernick{
     margin-top: 5px;
     font-size: 12px;

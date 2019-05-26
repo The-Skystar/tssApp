@@ -13,17 +13,17 @@
     <mt-tab-container v-model="selected">
       <mt-tab-container-item id="1">
         <div id="pwdLogin">
-          <mt-field placeholder="请输入用户名/邮箱/手机号" v-model="user"></mt-field><br>
-          <mt-field placeholder="请输入密码" type="password" v-model="password"></mt-field><br>
-          <mt-button size="large" @click="pwdLogin">登录</mt-button><br>
+          <mt-field placeholder="请输入用户名/邮箱/手机号" v-model="user"></mt-field>
+          <mt-field placeholder="请输入密码" type="password" v-model="password"></mt-field>
+          <mt-button size="large" @click="pwdLogin">登录</mt-button>
         </div>
       </mt-tab-container-item>
       <mt-tab-container-item id="2">
         <div id="verLogin">
-          <mt-field placeholder="请输入邮箱" type="email" v-model="email"></mt-field><br>
+          <mt-field placeholder="请输入邮箱" type="email" v-model="email"></mt-field>
           <mt-field placeholder="请输入验证码" type="number" v-model="code">
           <mt-button @click="sendCode">{{btntext}}</mt-button>
-          </mt-field><br>
+          </mt-field>
           <mt-button size="large" @click="codeLogin">登录</mt-button>
         </div>
       </mt-tab-container-item>
@@ -55,7 +55,7 @@
           "str":this.user,
           "pwd":this.password,
         }
-        this.$axios.post("/tss/pwdLogin",this.qs.stringify(params)).then(function (res) {
+        this.$axios.post(this.$store.state.url+"/tss/pwdLogin",this.qs.stringify(params)).then(function (res) {
           if (res.data.code!=100){
             console.log(res);
             Toast({
@@ -79,7 +79,7 @@
           "email":this.email,
           "ver":this.code,
         }
-        this.$axios.post("/tss/emailLogin",this.qs.stringify(params)).then(function (res) {
+        this.$axios.post(this.$store.state.url+"/tss/emailLogin",this.qs.stringify(params)).then(function (res) {
           if (res.data.code!=100){
             console.log(res);
             Toast({
@@ -118,7 +118,8 @@
         }else {
           let self = this;
           let param = {"email":this.email};
-          this.$axios.post("/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
+
+          this.$axios.post(this.$store.state.url+"/tss/sendEmail",this.qs.stringify(param)).then(function (res) {
             if (res.data.code==113){
               self.timer();
             }else {

@@ -34,7 +34,7 @@
             "userId":JSON.parse(this.$store.state.currentUser).userId
           }
         }
-        this.$axios.post("/tss/updUser",this.qs.stringify(params),headers).then(function (res) {
+        this.$axios.post(this.$store.state.url+"/tss/updUser",this.qs.stringify(params),headers).then(function (res) {
           if (res.data.code==118){
             localStorage.setItem("user",JSON.stringify(res.data.data));
             self.$store.dispatch('setUser',JSON.stringify(res.data.data));
