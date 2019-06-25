@@ -13,7 +13,7 @@
         <div id="sendOrder">
           <ul>
             <li v-for="items in sendOrder">
-              <div class="status"><p>裹裹寄件 | 已寄出</p></div>
+              <div class="status"><p>裹裹寄件 | {{items.status}}</p><button class="pay" v-if="showPay(items)" @click="pay(items)">付款：{{items.cost}}</button></div>
               <div class="detail">
                 <div>
                   <div class="detailTop"><p>{{items.receiver.name}}&nbsp;&nbsp;{{items.receiver.phone}}</p>&nbsp;&nbsp;&nbsp;
@@ -100,8 +100,9 @@
       this.websocketclose()
     },
     methods:{
-      pay(){
-        window.location.href = 'http://10.156.85.170:8082/alipay/wap/alipage?subject=快递运费&cost=0.01'
+      pay(items){
+        window.location.href = 'http://10.156.85.170:8082/alipay/wap/alipage?subject=快递运费&orderId='+items.orderId+'&cost='+items.cost;
+
       },
       initWebSocket: function () {
         // ws等同http，wss等同https,其中ip为后端应用主机，port为后端启动所占用的端口
@@ -164,6 +165,13 @@
             })
           }
         })
+      },
+      showPay(items){
+        if (items.status==='已取件') {
+          return true
+        }else {
+          return false
+        }
       }
     }
   }
@@ -220,5 +228,11 @@
     color: darkgrey;
     margin: 0px;
 
+  }
+  .pay{
+    position: absolute;
+    right: 20px;
+    border-radius: 5px;
+    border: 0px;
   }
 </style>

@@ -71,6 +71,13 @@
             self.$store.dispatch("updLogin",true);
             self.$router.push("/my");
           }
+        }).catch(function (res) {
+          console.log(res)
+          Toast({
+            message:'系统错误',
+            position:'middle',
+            duration:1000
+          })
         })
       },
       codeLogin(){
